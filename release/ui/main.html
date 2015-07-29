@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <link href="https://jqmdesigner.appspot.com/gk/lib/jquery.mobile/1.4.5/jquery.mobile-1.4.5.min.css" rel="stylesheet"
+          type="text/css"/>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+    $(document).on("mobileinit", function () {
+      $.mobile.autoInitializePage = false;
+      $.mobile.hashListeningEnabled = false;
+    });
+
+    function mobileInitPage() {
+      $.mobile.hashListeningEnabled = true;
+      $.mobile.initializePage();
+    };
+
+
+
+
+
+
+
+    </script>
+    <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <!-- Uncomment the following to include cordova in your android project -->
+    <!--<script src="http://jqmdesigner.appspot.com/platforms/android/cordova.js"></script>-->
+    <!-- GK Loader use RequireJS to load module -->
+    <script src="https://terranout.ath.cx/require.js"></script>
+    <!--Plug in GK-->
+    <script src="https://jqmdesigner.appspot.com/components/jquery.gk/jquery.gk.min.js"></script>
+    <!-- Load GK components -->
+    <script components="https://jqmdesigner.appspot.com/components/gk-jquerymobile/content.html,https://jqmdesigner.appspot.com/components/gk-jquerymobile/page.html"
+            callback="mobileInitPage" src="https://jqmdesigner.appspot.com/components/gk-loader/gk-loader.js"></script>
+    <title>Twoch saver</title>
+</head>
+
+<body gk-app>
+<!-- Page: home  -->
+<div id="home" data-role="page">
+    <div role="main" class="ui-content">
+        <a class="ui-btn" href="#status">Downloaded</a>
+
+        <div class="ui-field-contain">
+            <label for="txturl">URL</label>
+            <input type="text" name id="txturl">
+        </div>
+        <a class="ui-btn" href="#status" onclick="start();">Start</a>
+    </div>
+</div>
+<!-- Page: status  -->
+<div id="status" data-role="page" is="page">
+    <div role="main" class="ui-content" is="content">
+        <a class="ui-btn" href="#home">Back</a>
+        <a class="ui-btn" href="#" onclick="loadStat();">Refresh</a>
+        <table data-role="table" data-mode="columntoggle" class="ui-responsive ui-shadow gk-decorate" id="statistics"
+               is="jqm-table">
+            <thead>
+            <tr>
+                <th data-priority="1">Архив</th>
+                <th data-priority="1">Файлов</th>
+                <th data-priority="1">Осталось догрузить</th>
+                <th data-priority="1">Ссылка</th>
+                <th data-priority="1">Обновить</th>
+                <th data-priority="1">Завершено</th>
+                <th data-priority="1">Обновлений</th>
+                <th data-priority="1">Добавлено</th>
+                <th data-priority="1">Обновлено</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Page: downloaded  -->
+<div id="downloaded" data-role="page" is="page">
+    <div role="main" class="ui-content" is="content"></div>
+</div>
+</body>
+<script>
+    function start(){
+        var url = $("#txturl").val();
+          $.ajax({
+            url: 'https://terranout.ath.cx:8585/ts/jsonp/start?url='+url,
+            async: false,
+            type: 'get',
+	    jsonp: "callback",
+	    dataType: "jsonp",
+            success: function(data) {
+                $.mobile.changePage("#stat");
+                loadStat();
+            }
+        });
+    }
+
+    function download(link){
+          $.ajax({
+            url: '/ts/pack?bt='+link,
+            async: false,
+            type: 'get',
+            statusCode: {
+                404: function() {
+                alert( "page not found" );
+            }},
+            success: function(data) {
+                alert(data);
+                window.location.assign(data);
+            }
+        }).done(function(){alert("done");});
+   }
+
+    function loadStat(){
+    $.ajax({
+            url: 'https://terranout.ath.cx:8585/ts/jsonp/stat',
+            async: false,
+            type: 'get',
+	        jsonp: "callback",
+	        dataType: "jsonp",
+            success: function(data) {
+                var htmlRet = "";
+                var bts = [];
+                    $.each(data.stat, function(i, stat) {
+                        htmlRet += "<tr><th>"+stat.bt+"</th><td>"+stat.count+"</td><td>"+stat.remaining+"</td><td><a href='/ts/pack?bt="+stat.bt+"'>Скачать архивом</a></td><td><a href='/ts/refresh?bt="+stat.bt+"'>Обновить</a></td><td>"+stat.finished+"</td><td>"+stat.checked+"</td><td>"+stat.added+"</td><td>"+stat.updated+"</td></tr>";
+                        bts.push(stat.bt);
+                    });
+                    $( "table#statistics tbody" ).html("");
+                    $( "table#statistics tbody" ).append(htmlRet).closest( "table#statistics" ).table( "refresh" );
+            }
+        });
+    }
+
+</script>
+</html>
