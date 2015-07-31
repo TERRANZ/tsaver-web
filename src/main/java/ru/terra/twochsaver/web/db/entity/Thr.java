@@ -51,9 +51,6 @@ public class Thr implements Serializable {
     private Integer finished;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "thrId", fetch = FetchType.LAZY)
     private List<Img> imgList;
-    @Basic(optional = false)
-    @Column(nullable = false, length = 250)
-    private String title;
 
     public Thr() {
     }
@@ -135,60 +132,29 @@ public class Thr implements Serializable {
         this.imgList = imgList;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Thr thr = (Thr) o;
-
-        if (added != null ? !added.equals(thr.added) : thr.added != null) return false;
-        if (checked != null ? !checked.equals(thr.checked) : thr.checked != null) return false;
-        if (count != null ? !count.equals(thr.count) : thr.count != null) return false;
-        if (finished != null ? !finished.equals(thr.finished) : thr.finished != null) return false;
-        if (id != null ? !id.equals(thr.id) : thr.id != null) return false;
-        if (imgList != null ? !imgList.equals(thr.imgList) : thr.imgList != null) return false;
-        if (title != null ? !title.equals(thr.title) : thr.title != null) return false;
-        if (updated != null ? !updated.equals(thr.updated) : thr.updated != null) return false;
-        if (url != null ? !url.equals(thr.url) : thr.url != null) return false;
-
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Thr)) {
+            return false;
+        }
+        Thr other = (Thr) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (url != null ? url.hashCode() : 0);
-        result = 31 * result + (added != null ? added.hashCode() : 0);
-        result = 31 * result + (updated != null ? updated.hashCode() : 0);
-        result = 31 * result + (count != null ? count.hashCode() : 0);
-        result = 31 * result + (checked != null ? checked.hashCode() : 0);
-        result = 31 * result + (finished != null ? finished.hashCode() : 0);
-        result = 31 * result + (imgList != null ? imgList.hashCode() : 0);
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "ru.terra.twochsaver.web.db.Thr[ id=" + id + " ]";
     }
 
-    @Override
-    public String toString() {
-        return "Thr{" +
-                "id=" + id +
-                ", url='" + url + '\'' +
-                ", added=" + added +
-                ", updated=" + updated +
-                ", count=" + count +
-                ", checked=" + checked +
-                ", finished=" + finished +
-                ", imgList=" + imgList +
-                ", title='" + title + '\'' +
-                '}';
-    }
 }

@@ -15,7 +15,6 @@ public class Stat {
     public Integer checked;
     public String added;
     public String updated;
-    public String title;
 
 
     public Stat(String bt, Integer count, Integer remaining) {
@@ -24,7 +23,7 @@ public class Stat {
         this.remaining = remaining;
     }
 
-    public Stat(String bt, Integer count, Integer remaining, Integer finished, Integer checked, String added, String updated, String title) {
+    public Stat(String bt, Integer count, Integer remaining, Integer finished, Integer checked, String added, String updated) {
         this.bt = bt;
         this.count = count;
         this.remaining = remaining;
@@ -32,7 +31,6 @@ public class Stat {
         this.checked = checked;
         this.added = added;
         this.updated = updated;
-        this.title = title;
     }
 
     public Stat() {

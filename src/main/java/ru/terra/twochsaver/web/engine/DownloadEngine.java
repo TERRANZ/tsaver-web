@@ -85,7 +85,6 @@ public class DownloadEngine {
                     thr.setCount(0);
                     thr.setImgList(new ArrayList<Img>());
                     thr.setUrl(url);
-                    thr.setTitle("");
                     thrJpaController.create(thr);
                 } else {
                     if (thr.getChecked() > 30)
@@ -108,7 +107,7 @@ public class DownloadEngine {
                 final String board = resUrl.substring(resUrl.lastIndexOf("/") + 1);
                 URLConnection conn = null;
                 try {
-                    conn = new URL("https://2ch.pm/makaba/mobile.fcgi?task=get_thread&board=" + board + "&thread=" + thread + "&num=" + thread).openConnection();
+                    conn = new URL("https://2ch.hk/makaba/mobile.fcgi?task=get_thread&board=" + board + "&thread=" + thread + "&num=" + thread).openConnection();
                 } catch (IOException e) {
                     logger.error("Unable to connect to server", e);
                 }
@@ -131,10 +130,6 @@ public class DownloadEngine {
                 }
                 if (!error) {
                     Integer imagesCount = 0;
-
-                    if (readedThread[0] != null)
-                        thr.setTitle(readedThread[0].getSubject() != null ? readedThread[0].getSubject() : "");
-
                     for (TwochThread twochThread : readedThread)
                         imagesCount += twochThread.getFiles().size();
 
@@ -161,7 +156,7 @@ public class DownloadEngine {
 
                     final String finalResUrl = resUrl + "/";
                     for (TwochThread twochThread : readedThread)
-                        for (final TwochFile file : twochThread.getFiles()) {
+                        for (TwochFile file : twochThread.getFiles()) {
                             final String finalImageUrl = new String(finalResUrl + file.getPath());
                             final Thr finalThr = thr;
                             threadPool.submit(new Runnable() {
@@ -169,12 +164,10 @@ public class DownloadEngine {
                                 public void run() {
                                     try {
                                         if (imgJpaController.findImg(finalImageUrl) == null) {
-                                            String tfn = downloadImage(folderName, finalImageUrl);
+                                            downloadImage(folderName, finalImageUrl);
                                             Img img = new Img();
                                             img.setThrId(finalThr);
                                             img.setUrl(finalImageUrl);
-                                            img.setMd5hash(file.getMd5());
-                                            img.setFileName(tfn);
                                             imgJpaController.create(img);
                                         }
 
@@ -220,22 +213,21 @@ public class DownloadEngine {
         }
     }
 
-    private String downloadImage(String folder, String url) throws IOException {
+    private void downloadImage(String folder, String url) throws IOException {
         for (int i = 0; i <= 2; i++) {
             URL imageUrl = new URL(url);
             Path path = Paths.get(folder + url.substring(url.lastIndexOf("/")));
             if (!path.toFile().exists())
                 Files.copy(imageUrl.openStream(), path, StandardCopyOption.REPLACE_EXISTING);
             logger.info("Downloaded: " + url);
-            return path.toFile().getAbsolutePath();
+            break;
         }
-        return "";
     }
 
     public synchronized List<Stat> getStat() {
         List<Stat> ret = new ArrayList<>();
         for (Thr thr : thrJpaController.findThrEntities())
-            ret.add(new Stat(thr.getUrl(), thr.getCount(), thr.getCount() - imgJpaController.getImagesCountForThread(thr), thr.getFinished(), thr.getChecked(), sdf.format(thr.getAdded()), sdf.format(thr.getUpdated()), thr.getTitle()));
+            ret.add(new Stat(thr.getUrl(), thr.getCount(), thr.getCount() - imgJpaController.getImagesCountForThread(thr), thr.getFinished(), thr.getChecked(), sdf.format(thr.getAdded()), sdf.format(thr.getUpdated())));
         return ret;
     }
 }
