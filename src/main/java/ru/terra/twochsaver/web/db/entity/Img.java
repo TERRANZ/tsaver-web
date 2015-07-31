@@ -27,6 +27,13 @@ public class Img implements Serializable {
     @JoinColumn(name = "thr_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Thr thrId;
+    @Basic(optional = false)
+    @Column(nullable = false, length = 32)
+    private String md5hash;
+    @Basic(optional = false)
+    @Column(nullable = false, length = 150)
+    private String fileName;
+
 
     public Img() {
     }
@@ -51,29 +58,53 @@ public class Img implements Serializable {
         this.thrId = thrId;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (url != null ? url.hashCode() : 0);
-        return hash;
+    public String getMd5hash() {
+        return md5hash;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Img)) {
-            return false;
-        }
-        Img other = (Img) object;
-        if ((this.url == null && other.url != null) || (this.url != null && !this.url.equals(other.url))) {
-            return false;
-        }
-        return true;
+    public void setMd5hash(String md5hash) {
+        this.md5hash = md5hash;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     @Override
     public String toString() {
-        return "ru.terra.twochsaver.web.db.Img[ url=" + url + " ]";
+        return "Img{" +
+                "url='" + url + '\'' +
+                ", thrId=" + thrId +
+                ", md5hash='" + md5hash + '\'' +
+                ", fileName='" + fileName + '\'' +
+                '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Img img = (Img) o;
+
+        if (fileName != null ? !fileName.equals(img.fileName) : img.fileName != null) return false;
+        if (md5hash != null ? !md5hash.equals(img.md5hash) : img.md5hash != null) return false;
+        if (thrId != null ? !thrId.equals(img.thrId) : img.thrId != null) return false;
+        if (url != null ? !url.equals(img.url) : img.url != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = url != null ? url.hashCode() : 0;
+        result = 31 * result + (thrId != null ? thrId.hashCode() : 0);
+        result = 31 * result + (md5hash != null ? md5hash.hashCode() : 0);
+        result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
+        return result;
+    }
 }
