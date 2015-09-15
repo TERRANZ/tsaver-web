@@ -27,6 +27,9 @@ public class Img implements Serializable {
     @JoinColumn(name = "thr_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Thr thrId;
+    @Basic(optional = false)
+    @Column(nullable = false, length = 35)
+    private String md5hash;
 
     public Img() {
     }
@@ -49,6 +52,14 @@ public class Img implements Serializable {
 
     public void setThrId(Thr thrId) {
         this.thrId = thrId;
+    }
+
+    public String getMd5hash() {
+        return md5hash;
+    }
+
+    public void setMd5hash(String md5hash) {
+        this.md5hash = md5hash;
     }
 
     @Override

@@ -107,7 +107,7 @@ public class DownloadEngine {
                 final String board = resUrl.substring(resUrl.lastIndexOf("/") + 1);
                 URLConnection conn = null;
                 try {
-                    conn = new URL("https://2ch.hk/makaba/mobile.fcgi?task=get_thread&board=" + board + "&thread=" + thread + "&num=" + thread).openConnection();
+                    conn = new URL("https://2ch.pm/makaba/mobile.fcgi?task=get_thread&board=" + board + "&thread=" + thread + "&num=" + thread).openConnection();
                 } catch (IOException e) {
                     logger.error("Unable to connect to server", e);
                 }
@@ -156,7 +156,7 @@ public class DownloadEngine {
 
                     final String finalResUrl = resUrl + "/";
                     for (TwochThread twochThread : readedThread)
-                        for (TwochFile file : twochThread.getFiles()) {
+                        for (final TwochFile file : twochThread.getFiles()) {
                             final String finalImageUrl = new String(finalResUrl + file.getPath());
                             final Thr finalThr = thr;
                             threadPool.submit(new Runnable() {
@@ -168,6 +168,7 @@ public class DownloadEngine {
                                             Img img = new Img();
                                             img.setThrId(finalThr);
                                             img.setUrl(finalImageUrl);
+                                            img.setMd5hash(file.getMd5());
                                             imgJpaController.create(img);
                                         }
 
