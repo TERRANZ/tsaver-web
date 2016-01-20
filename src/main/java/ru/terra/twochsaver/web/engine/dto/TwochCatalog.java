@@ -28,6 +28,7 @@ public class TwochCatalog {
     private Integer maxComment;
     private List<TwochThread> threads = new ArrayList<TwochThread>();
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Integer uniquePosters;
 
     public String getBoard() {
         return board;
@@ -173,4 +174,11 @@ public class TwochCatalog {
         this.additionalProperties.put(name, value);
     }
 
+    public Integer getUniquePosters() {
+        return uniquePosters;
+    }
+
+    public void setUniquePosters(Integer uniquePosters) {
+        this.uniquePosters = uniquePosters;
+    }
 }

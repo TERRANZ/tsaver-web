@@ -24,7 +24,9 @@ public class TwochThread {
     private Integer timestamp;
     private String trip;
     private String email;
+    private String tags;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Integer unique_posters;
 
     public TwochThread() {
     }
@@ -157,4 +159,19 @@ public class TwochThread {
         this.additionalProperties.put(name, value);
     }
 
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public Integer getUnique_posters() {
+        return unique_posters;
+    }
+
+    public void setUnique_posters(Integer unique_posters) {
+        this.unique_posters = unique_posters;
+    }
 }

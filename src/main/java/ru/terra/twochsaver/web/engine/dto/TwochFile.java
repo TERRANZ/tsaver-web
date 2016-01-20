@@ -20,6 +20,7 @@ public class TwochFile {
     private Integer tn_height;
     private Integer tn_width;
     private String type;
+    private Integer duration;
 
     public TwochFile() {
     }
@@ -126,5 +127,13 @@ public class TwochFile {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 }
