@@ -140,7 +140,7 @@
                 var htmlRet = "";
                 var bts = [];
                 $.each(data.stat, function (i, stat) {
-                    htmlRet += "<tr onclick='loadShow(" + stat.bt + ")'><th>" + stat.bt + "</th><td>" + stat.count + "</td><td>" + stat.remaining + "</td><td><a href='/ts/pack?bt=" + stat.bt + "'>Скачать архивом</a></td><td><a href='/ts/refresh?bt=" + stat.bt + "'>Обновить</a></td><td>" + stat.finished + "</td><td>" + stat.checked + "</td><td>" + stat.added + "</td><td>" + stat.updated + "</td></tr>";
+                    htmlRet += "<tr onclick='loadShow(\"" + stat.bt + "\")'><th>" + stat.bt + "</th><td>" + stat.count + "</td><td>" + stat.remaining + "</td><td><a href='/ts/pack?bt=" + stat.bt + "'>Скачать архивом</a></td><td><a href='/ts/refresh?bt=" + stat.bt + "'>Обновить</a></td><td>" + stat.finished + "</td><td>" + stat.checked + "</td><td>" + stat.added + "</td><td>" + stat.updated + "</td></tr>";
                     bts.push(stat.bt);
                 });
                 $("table#statistics tbody").html("");

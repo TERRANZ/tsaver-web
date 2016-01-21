@@ -1,6 +1,7 @@
 package ru.terra.twochsaver.web.engine;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,6 +10,10 @@ import java.util.List;
 @XmlRootElement
 public class Show extends Stat {
     public List<String> images;
+
+    public Show() {
+        this.images = new ArrayList<>();
+    }
 
     public Show(String bt, Integer count, Integer remaining, Integer finished, Integer checked, String added, String updated, List<String> images) {
         super(bt, count, remaining, finished, checked, added, updated);
