@@ -25,7 +25,7 @@
     <!-- Uncomment the following to include cordova in your android project -->
     <!--<script src="http://jqmdesigner.appspot.com/platforms/android/cordova.js"></script>-->
     <!-- GK Loader use RequireJS to load module -->
-    <script src="https://terranout.ath.cx/require.js"></script>
+    <script src="https://terranout.mine.nu/require.js"></script>
     <!--Plug in GK-->
     <script src="https://jqmdesigner.appspot.com/components/jquery.gk/jquery.gk.min.js"></script>
     <!-- Load GK components -->
@@ -98,7 +98,7 @@
     function start() {
         var url = $("#txturl").val();
         $.ajax({
-            url: 'https://terranout.ath.cx:8585/ts/jsonp/start?url=' + url,
+            url: 'https://terranout.mine.nu:8585/ts/jsonp/start?url=' + url,
             async: false,
             type: 'get',
             jsonp: "callback",
@@ -131,7 +131,7 @@
 
     function loadStat() {
         $.ajax({
-            url: 'https://terranout.ath.cx:8585/ts/jsonp/stat',
+            url: 'https://terranout.mine.nu:8585/ts/jsonp/stat',
             async: false,
             type: 'get',
             jsonp: "callback",
@@ -151,7 +151,7 @@
 
     function loadShow(bt) {
         $.ajax({
-            url: 'https://terranout.ath.cx:8585/ts/jsonp/show?bt=' + bt,
+            url: 'https://terranout.mine.nu:8585/ts/jsonp/show?bt=' + bt,
             async: false,
             type: 'get',
             jsonp: "callback",

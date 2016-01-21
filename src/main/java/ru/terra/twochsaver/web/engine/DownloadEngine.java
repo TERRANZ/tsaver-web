@@ -224,7 +224,7 @@ public class DownloadEngine {
     }
 
     public Show getShow(String bt) {
-        Thr thr = thrJpaController.findThr(Integer.parseInt(bt));
+        Thr thr = thrJpaController.findByUrl(bt);
         if (thr == null)
             return null;
 
