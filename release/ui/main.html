@@ -8,20 +8,16 @@
           type="text/css"/>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script>
-    $(document).on("mobileinit", function () {
-      $.mobile.autoInitializePage = false;
-      $.mobile.hashListeningEnabled = false;
-    });
+        $(document).on("mobileinit", function () {
+            $.mobile.autoInitializePage = false;
+            $.mobile.hashListeningEnabled = false;
+        });
 
-    function mobileInitPage() {
-      $.mobile.hashListeningEnabled = true;
-      $.mobile.initializePage();
-    };
-
-
-
-
-
+        function mobileInitPage() {
+            $.mobile.hashListeningEnabled = true;
+            $.mobile.initializePage();
+        }
+        ;
 
 
     </script>
@@ -75,6 +71,23 @@
             </tbody>
         </table>
     </div>
+</div><!-- Page: status  -->
+<div id="show" data-role="page" is="page">
+    <div role="main" class="ui-content" is="content">
+        <a class="ui-btn" href="#home">Back</a>
+        <a class="ui-btn" href="#" onclick="loadShow();">Refresh</a>
+        <table data-role="table" data-mode="columntoggle" class="ui-responsive ui-shadow gk-decorate" id="show_table"
+               is="jqm-table">
+            <thead>
+            <tr>
+                <th data-priority="1">Путь</th>
+                <th data-priority="1">Файл</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 </div>
 <!-- Page: downloaded  -->
 <div id="downloaded" data-role="page" is="page">
@@ -82,56 +95,79 @@
 </div>
 </body>
 <script>
-    function start(){
+    function start() {
         var url = $("#txturl").val();
-          $.ajax({
-            url: 'https://terranout.ath.cx:8585/ts/jsonp/start?url='+url,
+        $.ajax({
+            url: 'https://terranout.ath.cx:8585/ts/jsonp/start?url=' + url,
             async: false,
             type: 'get',
-	    jsonp: "callback",
-	    dataType: "jsonp",
-            success: function(data) {
+            jsonp: "callback",
+            dataType: "jsonp",
+            success: function (data) {
                 $.mobile.changePage("#stat");
                 loadStat();
             }
         });
     }
 
-    function download(link){
-          $.ajax({
-            url: '/ts/pack?bt='+link,
+    function download(link) {
+        $.ajax({
+            url: '/ts/pack?bt=' + link,
             async: false,
             type: 'get',
             statusCode: {
-                404: function() {
-                alert( "page not found" );
-            }},
-            success: function(data) {
+                404: function () {
+                    alert("page not found");
+                }
+            },
+            success: function (data) {
                 alert(data);
                 window.location.assign(data);
             }
-        }).done(function(){alert("done");});
-   }
+        }).done(function () {
+            alert("done");
+        });
+    }
 
-    function loadStat(){
-    $.ajax({
+    function loadStat() {
+        $.ajax({
             url: 'https://terranout.ath.cx:8585/ts/jsonp/stat',
             async: false,
             type: 'get',
-	        jsonp: "callback",
-	        dataType: "jsonp",
-            success: function(data) {
+            jsonp: "callback",
+            dataType: "jsonp",
+            success: function (data) {
                 var htmlRet = "";
                 var bts = [];
-                    $.each(data.stat, function(i, stat) {
-                        htmlRet += "<tr><th>"+stat.bt+"</th><td>"+stat.count+"</td><td>"+stat.remaining+"</td><td><a href='/ts/pack?bt="+stat.bt+"'>Скачать архивом</a></td><td><a href='/ts/refresh?bt="+stat.bt+"'>Обновить</a></td><td>"+stat.finished+"</td><td>"+stat.checked+"</td><td>"+stat.added+"</td><td>"+stat.updated+"</td></tr>";
-                        bts.push(stat.bt);
-                    });
-                    $( "table#statistics tbody" ).html("");
-                    $( "table#statistics tbody" ).append(htmlRet).closest( "table#statistics" ).table( "refresh" );
+                $.each(data.stat, function (i, stat) {
+                    htmlRet += "<tr onclick='loadShow(" + stat.bt + ")'><th>" + stat.bt + "</th><td>" + stat.count + "</td><td>" + stat.remaining + "</td><td><a href='/ts/pack?bt=" + stat.bt + "'>Скачать архивом</a></td><td><a href='/ts/refresh?bt=" + stat.bt + "'>Обновить</a></td><td>" + stat.finished + "</td><td>" + stat.checked + "</td><td>" + stat.added + "</td><td>" + stat.updated + "</td></tr>";
+                    bts.push(stat.bt);
+                });
+                $("table#statistics tbody").html("");
+                $("table#statistics tbody").append(htmlRet).closest("table#statistics").table("refresh");
             }
         });
     }
 
+    function loadShow(bt) {
+        $.ajax({
+            url: 'https://terranout.ath.cx:8585/ts/jsonp/show?bt=' + bt,
+            async: false,
+            type: 'get',
+            jsonp: "callback",
+            dataType: "jsonp",
+            success: function (data) {
+                $.mobile.changePage("#show");
+                var htmlRet = "";
+                var bts = [];
+                $.each(data.images, function (i, image) {
+                    htmlRet += "<tr><td>" + image + "</td><img><img src='" + show + "'/></td><td><a href='/ts/pack?bt=" + show.bt + "'>Скачать архивом</a></td><td><a href='/ts/refresh?bt=" + show.bt + "'>Обновить</a></td><td>" + show.finished + "</td><td>" + show.checked + "</td><td>" + show.added + "</td><td>" + show.updated + "</td></tr>";
+                    bts.push(show.bt);
+                });
+                $("table#show_table tbody").html("");
+                $("table#show_table tbody").append(htmlRet).closest("table#show_table").table("refresh");
+            }
+        });
+    }
 </script>
 </html>

@@ -27,6 +27,8 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * Date: 21.01.15
@@ -37,7 +39,7 @@ public class DownloadEngine {
     private static DownloadEngine instance = new DownloadEngine();
     private ExecutorService threadPool = Executors.newFixedThreadPool(20);
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private Map<String, CountDownLatch> countdowns = new HashMap<>();
+    private final Map<String, CountDownLatch> countdowns = new HashMap<>();
     private Map<String, Integer> counts = new HashMap<>();
     private ThrJpaController thrJpaController = new ThrJpaController();
     private ImgJpaController imgJpaController = new ImgJpaController();
@@ -47,12 +49,10 @@ public class DownloadEngine {
         List<File> files = new ArrayList<>();
 
         addTree(new File("download"), files);
-        for (File file : files) {
-            if (file.isDirectory()) {
-                counts.put(file.getName(), file.list().length);
-                countdowns.put(file.getName(), new CountDownLatch(0));
-            }
-        }
+        files.stream().filter(File::isDirectory).forEach(file -> {
+            counts.put(file.getName(), file.list().length);
+            countdowns.put(file.getName(), new CountDownLatch(0));
+        });
     }
 
     static void addTree(File file, Collection<File> all) {
@@ -71,117 +71,111 @@ public class DownloadEngine {
 
     public synchronized void start(final String url, final boolean force) {
         logger.info("Starting: " + url);
-        threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
+        Future<?> submit = threadPool.submit((Runnable) () -> {
 
-                Thr thr = thrJpaController.findByUrl(url);
-                if (thr == null) {
-                    thr = new Thr();
-                    thr.setUpdated(new Date());
-                    thr.setAdded(new Date());
-                    thr.setChecked(0);
-                    thr.setFinished(0);
-                    thr.setCount(0);
-                    thr.setImgList(new ArrayList<Img>());
-                    thr.setUrl(url);
-                    thrJpaController.create(thr);
-                } else {
-                    if (thr.getChecked() > 30)
-                        thr.setFinished(1);
-                    try {
-                        thrJpaController.update(thr);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (!force)
-                    if (thr.getFinished() == 1) {
-                        TsaverTimerManager.getInstance().removeThreadJob(url);
-                        return;
-                    }
-
-                final Integer thread = Integer.parseInt(url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf(".")));
-                String resUrl = url.substring(0, url.indexOf("/res"));
-                final String board = resUrl.substring(resUrl.lastIndexOf("/") + 1);
-                URLConnection conn = null;
-                try {
-                    conn = new URL("http://2ch.hk/makaba/mobile.fcgi?task=get_thread&board=" + board + "&thread=" + thread + "&num=" + thread).openConnection();
-                } catch (IOException e) {
-                    logger.error("Unable to connect to server", e);
-                }
-                conn.setConnectTimeout(10000);
-                ObjectMapper mapper = new ObjectMapper();
-                TwochThread[] readedThread = new TwochThread[0];
-                boolean error = false;
-                try {
-                    readedThread = mapper.readValue(conn.getInputStream(), TwochThread[].class);
-                } catch (IOException e) {
-                    error = true;
-                    TsaverTimerManager.getInstance().removeThreadJob(url);
+            Thr thr = thrJpaController.findByUrl(url);
+            if (thr == null) {
+                thr = new Thr();
+                thr.setUpdated(new Date());
+                thr.setAdded(new Date());
+                thr.setChecked(0);
+                thr.setFinished(0);
+                thr.setCount(0);
+                thr.setImgList(new ArrayList<Img>());
+                thr.setUrl(url);
+                thrJpaController.create(thr);
+            } else {
+                if (thr.getChecked() > 30)
                     thr.setFinished(1);
-                    try {
-                        thrJpaController.update(thr);
-                    } catch (Exception e1) {
-                        logger.error("Unable to update thread", e1);
-                    }
-                    logger.error("Unable to read json", e);
+                try {
+                    thrJpaController.update(thr);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                if (!error) {
-                    Integer imagesCount = 0;
-                    for (TwochThread twochThread : readedThread)
-                        imagesCount += twochThread.getFiles().size();
+            }
 
-                    logger.info("Images count: " + imagesCount);
+            if (!force)
+                if (thr.getFinished() == 1) {
+                    TsaverTimerManager.getInstance().removeThreadJob(url);
+                    return;
+                }
 
-                    if (thr.getCount() == imagesCount)
-                        thr.setChecked(thr.getChecked() + 1);
-                    else
-                        thr.setChecked(0);
+            final Integer thread = Integer.parseInt(url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf(".")));
+            String resUrl = url.substring(0, url.indexOf("/res"));
+            final String board = resUrl.substring(resUrl.lastIndexOf("/") + 1);
+            URLConnection conn = null;
+            try {
+                conn = new URL("http://2ch.hk/makaba/mobile.fcgi?task=get_thread&board=" + board + "&thread=" + thread + "&num=" + thread).openConnection();
+            } catch (IOException e) {
+                logger.error("Unable to connect to server", e);
+            }
+            conn.setConnectTimeout(10000);
+            ObjectMapper mapper = new ObjectMapper();
+            TwochThread[] readedThread = new TwochThread[0];
+            boolean error = false;
+            try {
+                readedThread = mapper.readValue(conn.getInputStream(), TwochThread[].class);
+            } catch (IOException e) {
+                error = true;
+                TsaverTimerManager.getInstance().removeThreadJob(url);
+                thr.setFinished(1);
+                try {
+                    thrJpaController.update(thr);
+                } catch (Exception e1) {
+                    logger.error("Unable to update thread", e1);
+                }
+                logger.error("Unable to read json", e);
+            }
+            if (!error) {
+                Integer imagesCount = 0;
+                for (TwochThread twochThread : readedThread)
+                    imagesCount += twochThread.getFiles().size();
 
-                    thr.setCount(imagesCount);
-                    try {
-                        thrJpaController.update(thr);
-                    } catch (Exception e) {
-                        logger.error("Unable to update thread", e);
-                    }
+                logger.info("Images count: " + imagesCount);
 
-                    counts.put(board + thread, imagesCount);
-                    countdowns.put(board + thread, new CountDownLatch(imagesCount));
+                if (thr.getCount() == imagesCount)
+                    thr.setChecked(thr.getChecked() + 1);
+                else
+                    thr.setChecked(0);
 
-                    final String folderName = "download/" + board + thread;
-                    new File(folderName).mkdirs();
-                    addBtSyncFolder(folderName);
+                thr.setCount(imagesCount);
+                try {
+                    thrJpaController.update(thr);
+                } catch (Exception e) {
+                    logger.error("Unable to update thread", e);
+                }
 
-                    final String finalResUrl = resUrl + "/";
-                    for (TwochThread twochThread : readedThread)
-                        for (final TwochFile file : twochThread.getFiles()) {
-                            final String finalImageUrl = new String(finalResUrl + file.getPath());
-                            final Thr finalThr = thr;
-                            threadPool.submit(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        if (imgJpaController.findImg(finalImageUrl) == null) {
-                                            downloadImage(folderName, finalImageUrl);
-                                            Img img = new Img();
-                                            img.setThrId(finalThr);
-                                            img.setUrl(finalImageUrl);
-                                            img.setMd5hash(file.getMd5());
-                                            imgJpaController.create(img);
-                                        }
+                counts.put(board + thread, imagesCount);
+                countdowns.put(board + thread, new CountDownLatch(imagesCount));
 
-                                        CountDownLatch countDownLatch = getCountDown(board + thread);
-                                        if (countDownLatch != null)
-                                            countDownLatch.countDown();
-                                    } catch (Exception e) {
-                                        logger.error("Unable to download image " + finalImageUrl, e);
-                                    }
+                final String folderName = "download/" + board + thread;
+                new File(folderName).mkdirs();
+                addBtSyncFolder(folderName);
+
+                final String finalResUrl = resUrl + "/";
+                for (TwochThread twochThread : readedThread)
+                    for (final TwochFile file : twochThread.getFiles()) {
+                        final String finalImageUrl = finalResUrl + file.getPath();
+                        final Thr finalThr = thr;
+                        threadPool.submit((Runnable) () -> {
+                            try {
+                                if (imgJpaController.findImg(finalImageUrl) == null) {
+                                    downloadImage(folderName, finalImageUrl);
+                                    Img img = new Img();
+                                    img.setThrId(finalThr);
+                                    img.setUrl(finalImageUrl);
+                                    img.setMd5hash(file.getMd5());
+                                    imgJpaController.create(img);
                                 }
-                            });
-                        }
-                }
+
+                                CountDownLatch countDownLatch = getCountDown(board + thread);
+                                if (countDownLatch != null)
+                                    countDownLatch.countDown();
+                            } catch (Exception e) {
+                                logger.error("Unable to download image " + finalImageUrl, e);
+                            }
+                        });
+                    }
             }
         });
     }
@@ -226,9 +220,15 @@ public class DownloadEngine {
     }
 
     public synchronized List<Stat> getStat() {
-        List<Stat> ret = new ArrayList<>();
-        for (Thr thr : thrJpaController.findThrEntities())
-            ret.add(new Stat(thr.getUrl(), thr.getCount(), thr.getCount() - imgJpaController.getImagesCountForThread(thr), thr.getFinished(), thr.getChecked(), sdf.format(thr.getAdded()), sdf.format(thr.getUpdated())));
-        return ret;
+        return thrJpaController.findThrEntities().stream().map(thr -> new Stat(thr.getUrl(), thr.getCount(), thr.getCount() - imgJpaController.getImagesCountForThread(thr), thr.getFinished(), thr.getChecked(), sdf.format(thr.getAdded()), sdf.format(thr.getUpdated()))).collect(Collectors.toList());
+    }
+
+    public Show getShow(String bt) {
+        Thr thr = thrJpaController.findThr(Integer.parseInt(bt));
+        if (thr == null)
+            return null;
+
+        return new Show(thr.getUrl(), thr.getCount(), thr.getCount() - imgJpaController.getImagesCountForThread(thr), thr.getFinished(), thr.getChecked(), sdf.format(thr.getAdded()), sdf.format(thr.getUpdated()),
+                imgJpaController.getImagesForThread(thr).stream().map(Img::getUrl).collect(Collectors.toList()));
     }
 }

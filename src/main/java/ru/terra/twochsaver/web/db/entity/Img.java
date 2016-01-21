@@ -17,6 +17,7 @@ import java.io.Serializable;
 @NamedQueries({
         @NamedQuery(name = "Img.findAll", query = "SELECT i FROM Img i"),
         @NamedQuery(name = "Img.countForThr", query = "SELECT count(i) FROM Img i WHERE i.thrId = :thr"),
+        @NamedQuery(name = "Img.findForThr", query = "SELECT i FROM Img i WHERE i.thrId = :thr"),
         @NamedQuery(name = "Img.findByUrl", query = "SELECT i FROM Img i WHERE i.url = :url")})
 public class Img implements Serializable {
     private static final long serialVersionUID = 1L;

@@ -173,4 +173,13 @@ public class ImgJpaController extends AbstractJpaController<Img> {
             em.close();
         }
     }
+
+    public List<Img> getImagesForThread(Thr thr) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createNamedQuery("Img.findForThr", Img.class).setParameter("thr", thr).getResultList();
+        } finally {
+            em.close();
+        }
+    }
 }

@@ -56,4 +56,10 @@ public class JsonpController extends AbstractResource {
         URI redirect = URI.create(Config.getConfig().getValue("host", "http://192.168.1.3/") + "/main.html#status");
         return new JSONWithPadding(new SimpleDataDTO<>("ok"), callback);
     }
+
+    @Path("show")
+    @GET
+    public JSONWithPadding getShow(@QueryParam("callback") String callback, @QueryParam("bt") String bt) {
+        return new JSONWithPadding(DownloadEngine.getInstance().getShow(bt), callback);
+    }
 }
