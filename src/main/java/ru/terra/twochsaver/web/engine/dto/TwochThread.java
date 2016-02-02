@@ -27,6 +27,7 @@ public class TwochThread {
     private String tags;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     private Integer unique_posters;
+    private String nsfw;
 
     public TwochThread() {
     }
@@ -173,5 +174,13 @@ public class TwochThread {
 
     public void setUnique_posters(Integer unique_posters) {
         this.unique_posters = unique_posters;
+    }
+
+    public String getNsfw() {
+        return nsfw;
+    }
+
+    public void setNsfw(String nsfw) {
+        this.nsfw = nsfw;
     }
 }

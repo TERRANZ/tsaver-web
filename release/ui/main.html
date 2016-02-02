@@ -159,10 +159,13 @@
             success: function (data) {
                 $.mobile.changePage("#show");
                 var htmlRet = "";
-                var bts = [];
                 $.each(data.images, function (i, image) {
-                    htmlRet += "<tr><td>" + image + "</td><img><img src='" + show + "'/></td><td><a href='/ts/pack?bt=" + show.bt + "'>Скачать архивом</a></td><td><a href='/ts/refresh?bt=" + show.bt + "'>Обновить</a></td><td>" + show.finished + "</td><td>" + show.checked + "</td><td>" + show.added + "</td><td>" + show.updated + "</td></tr>";
-                    bts.push(show.bt);
+		    var iurl = "https://terranout.mine.nu:8585/tsaver/";
+	    	    var b = image.substr(image.indexOf("src/")-2,image.length);
+		    b = b.substr(0,b.indexOf("/"));
+		    iurl += b;
+		    iurl += image.substr(image.indexOf("src/")+4,image.length);
+                    htmlRet += "<tr><td>" + image + "</td><td><img src='" + iurl + "'/></td></tr>";
                 });
                 $("table#show_table tbody").html("");
                 $("table#show_table tbody").append(htmlRet).closest("table#show_table").table("refresh");

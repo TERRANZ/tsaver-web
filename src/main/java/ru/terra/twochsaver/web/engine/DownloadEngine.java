@@ -105,7 +105,7 @@ public class DownloadEngine {
             final String board = resUrl.substring(resUrl.lastIndexOf("/") + 1);
             URLConnection conn = null;
             try {
-                conn = new URL("http://2ch.hk/makaba/mobile.fcgi?task=get_thread&board=" + board + "&thread=" + thread + "&num=" + thread).openConnection();
+                conn = new URL("https://2ch.hk/makaba/mobile.fcgi?task=get_thread&board=" + board + "&thread=" + thread + "&num=" + thread).openConnection();
             } catch (IOException e) {
                 logger.error("Unable to connect to server", e);
             }
@@ -114,6 +114,7 @@ public class DownloadEngine {
             TwochThread[] readedThread = new TwochThread[0];
             boolean error = false;
             try {
+
                 readedThread = mapper.readValue(conn.getInputStream(), TwochThread[].class);
             } catch (IOException e) {
                 error = true;

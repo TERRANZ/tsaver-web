@@ -21,6 +21,8 @@ public class TwochFile {
     private Integer tn_width;
     private String type;
     private String duration;
+    private String nsfw;
+    ;
 
     public TwochFile() {
     }
@@ -136,4 +138,13 @@ public class TwochFile {
     public void setDuration(String duration) {
         this.duration = duration;
     }
+
+    public String getNsfw() {
+        return nsfw;
+    }
+
+    public void setNsfw(String nsfw) {
+        this.nsfw = nsfw;
+    }
 }
+
