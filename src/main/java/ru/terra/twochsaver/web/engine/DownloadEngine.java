@@ -188,16 +188,17 @@ public class DownloadEngine {
 
             String name = Config.getConfig().getValue("btsync.name", "");
             String password = Config.getConfig().getValue("btsync.pass", "");
+            String host = Config.getConfig().getValue("btsync.host", "http://xn--80aafhfrpg0adapheyc1nya.xn--p1ai:8888");
             String authString = name + ":" + password;
             String authStringEnc = Base64.getEncoder().encodeToString(authString.getBytes(Charset.defaultCharset()));
             logger.debug("Encoded auth string = " + authStringEnc);
 
-            URLConnection btsConn = new URL("http://xn--80aafhfrpg0adapheyc1nya.xn--p1ai:8888/api?method=add_folder&dir=" + currentDir + "/" + folder).openConnection();
+            URLConnection btsConn = new URL(host + "/api?method=add_folder&dir=" + currentDir + "/" + folder).openConnection();
             btsConn.setRequestProperty("Authorization", "Basic " + authStringEnc);
             btsConn.setConnectTimeout(10000);
             ObjectMapper mapper = new ObjectMapper();
             SyncDTO res = mapper.readValue(btsConn.getInputStream(), SyncDTO.class);
-            logger.debug("Sync for folder " + currentDir + "/" + folder + " reported: " + res.error + " messag: " + res.message);
+            logger.debug("Sync for folder " + currentDir + "/" + folder + " reported: " + res.error + " message: " + res.message);
         } catch (IOException e) {
             logger.error("Unable to add folder to sync", e);
         }
