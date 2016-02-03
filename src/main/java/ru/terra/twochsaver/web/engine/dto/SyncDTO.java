@@ -8,4 +8,5 @@ public class SyncDTO {
     public String id = "";
     public String error = "";
     public String message = "";
+    public String share_id = "";
 }
