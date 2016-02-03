@@ -5,6 +5,7 @@ package ru.terra.twochsaver.web.engine.dto;
  * Time: 16:06
  */
 public class SyncDTO {
+    public String id = "";
     public String error = "";
     public String message = "";
 }
