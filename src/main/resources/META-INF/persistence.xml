@@ -4,6 +4,7 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>ru.terra.twochsaver.web.db.entity.Img</class>
     <class>ru.terra.twochsaver.web.db.entity.Thr</class>
+    <class>ru.terra.twochsaver.web.db.entity.Message</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>ALL</shared-cache-mode>
     <properties>

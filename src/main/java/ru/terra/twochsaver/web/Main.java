@@ -13,17 +13,14 @@ import java.io.IOException;
  */
 public class Main {
     public static void main(String... args) throws IOException {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    for (Thr thr : new ThrJpaController().findUnfinished())
-                        TsaverTimerManager.getInstance().addUpdateThreadJob(thr.getUrl());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        new Thread(() -> {
+            try {
+                for (Thr thr : new ThrJpaController().findUnfinished())
+                    TsaverTimerManager.getInstance().addUpdateThreadJob(thr.getUrl());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
-        new ServerBoot().start("ru.terra.twochsaver");
+        new ServerBoot().start();
     }
 }
