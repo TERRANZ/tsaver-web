@@ -114,7 +114,6 @@ public class DownloadEngine {
             TwochThread[] readedThread = new TwochThread[0];
             boolean error = false;
             try {
-
                 readedThread = mapper.readValue(conn.getInputStream(), TwochThread[].class);
             } catch (IOException e) {
                 error = true;
@@ -151,7 +150,7 @@ public class DownloadEngine {
 
                 final String folderName = "download/" + board + thread;
                 new File(folderName).mkdirs();
-                addBtSyncFolder(folderName);
+                new Thread(() -> addBtSyncFolder(folderName)).start();
 
                 final String finalResUrl = resUrl + "/";
                 for (TwochThread twochThread : readedThread)
